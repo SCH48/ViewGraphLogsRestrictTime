@@ -1,16 +1,19 @@
-# Import Required Library
+import datetime
 from tkinter import *
 from tkcalendar import Calendar
 
+days = []
+now = datetime.datetime.now()
+year = now.year
+month = now.month
+day = now.day
+
 # Create Object
 root = Tk()
-# Set geometry
-root.geometry("400x400")
-# Add Calendar
-cal = Calendar(root, selectmode='day',
-               year=2020, month=5,
-               day=22)
-cal.pack(pady=20)
+root.title("Календарь")
+root.geometry("300x300")
+cal = Calendar(root, selectmode='day', year=year, month=month, day=day)
+cal.pack()
 
 def grad_date():
     date.config(text="Selected Date is: " + cal.get_date())
