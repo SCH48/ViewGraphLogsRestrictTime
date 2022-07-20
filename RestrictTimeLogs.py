@@ -1,31 +1,51 @@
 # Библиотеки
 import os
-from datetime import datetime
+from datetime import date,datetime,timedelta
+from tkinter import *
 
 # Переменные
 foldernamelog = "LOGS"
 dateFormat_file_name = "%Y-%m-%d"
-datetimeFormatInLog = "%d.%m.%Y %H:%M:%S"
+datetimeFormat_InLog = "%d.%m.%Y %H:%M:%S"
 
 # Функции
-def get_period(foldernamelog):
+def get_all_dates(foldernamelog, dateFormat_file_name):
     """ Получить все даты файлов в папке с логами Даты содержатся в имени файлов  """
-    listdates = list()
+    listdates = []
     for file in os.listdir(foldernamelog):
         if file.endswith(".log"):
-            listdates.append(file.split(".")[0])
+            filename = file.split(".")[0]
+            datefile = datetime.strptime(filename, dateFormat_file_name)
+            listdates.append(datefile)
     return listdates
 
-def get_start_stop_dates():
-    """ Предоставить выбор дат начала графика и конца, вернуть 2 значения  """
-    # TODO: доделать выбор дат пока возвращаем конкретные значения
-    return "2022-11-28", "2022-12-28"
+def get_start_stop_dates(list_all_dates):
+    """ Получаем начальные границы дат как последняя доступная минус 1 месяц """
+    last_date = list_all_dates[-1]
+    start_date = last_date - timedelta()
+    return start_date,last_date
 
+
+def draw_select_dates():
+    """ Рисуем окно с выбором начальной и конечной даты """
+    pass
+
+def get_data_for_diag():
+    """ Отбираем данные для диаграммы из файлов с требуемым диапазоном дат """
+    pass
+
+def draw_diag():
+    """ Рисуем диаграмму по набору дат """
+    pass
 
 #######################################################################
-
 print("Начали")
-listdates = get_period(foldernamelog)  # получаем список дат
-print(listdates)
-start_stop = get_start_stop_dates()  # получить стартовую и конечную дату
+
+list_all_dates = get_all_dates(foldernamelog,dateFormat_file_name)
+start_stop_dates = get_start_stop_dates(list_all_dates) # Получить начальные даты как текщая дата минус 30 дней
+print(start_stop_dates)
+draw_select_dates() # Рисуем окно с выбором начальной и конечной даты
+get_data_for_diag()# Получаем две даты и вытаскиваем из всех файлов этого периода время
+draw_diag() # Рисуем диаграмму по полученным временам.
+
 print("Кончили")
