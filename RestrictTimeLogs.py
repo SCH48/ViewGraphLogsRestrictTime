@@ -42,7 +42,7 @@ def draw_diag():
 print("Начали")
 
 list_all_dates = get_all_dates(foldernamelog,dateFormat_file_name)
-start_stop_dates = get_start_stop_dates(list_all_dates) # Получить начальные даты как текщая дата минус 30 дней
+start_stop_dates = get_start_stop_dates(list_all_dates) # Получить начальные даты как текущая дата минус 30 дней
 print(start_stop_dates)
 draw_select_dates() # Рисуем окно с выбором начальной и конечной даты
 get_data_for_diag()# Получаем две даты и вытаскиваем из всех файлов этого периода время
