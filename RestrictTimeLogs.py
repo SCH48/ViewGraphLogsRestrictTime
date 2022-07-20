@@ -25,10 +25,15 @@ def get_start_stop_dates(list_all_dates):
     start_date = last_date - timedelta()
     return start_date,last_date
 
-
-def draw_select_dates():
+def draw_select_dates(start_stop_dates):
     """ Рисуем окно с выбором начальной и конечной даты """
-    pass
+    start_date = start_stop_dates[0]
+    stop_date = start_stop_dates[1]
+
+    # Создаём окно
+    root = Tk()
+
+
 
 def get_data_for_diag():
     """ Отбираем данные для диаграммы из файлов с требуемым диапазоном дат """
@@ -43,8 +48,7 @@ print("Начали")
 
 list_all_dates = get_all_dates(foldernamelog,dateFormat_file_name)
 start_stop_dates = get_start_stop_dates(list_all_dates) # Получить начальные даты как текущая дата минус 30 дней
-print(start_stop_dates)
-draw_select_dates() # Рисуем окно с выбором начальной и конечной даты
+draw_select_dates(start_stop_dates) # Рисуем окно с выбором начальной и конечной даты
 get_data_for_diag()# Получаем две даты и вытаскиваем из всех файлов этого периода время
 draw_diag() # Рисуем диаграмму по полученным временам.
 
