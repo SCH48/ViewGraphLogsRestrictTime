@@ -2,7 +2,6 @@ from tkinter import *
 import calendar
 import datetime
 
-
 def back():
     global month, year
     month -= 1
@@ -11,7 +10,6 @@ def back():
         year -= 1
     fill()
 
-
 def next():
     global month, year
     month += 1
@@ -19,7 +17,6 @@ def next():
         month = 1
         year += 1
     fill()
-
 
 def fill():
     info_label['text'] = calendar.month_name[month] + ', ' + str(year)
