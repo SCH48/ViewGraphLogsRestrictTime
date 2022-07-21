@@ -32,6 +32,11 @@ def choose_dates(list_all_dates):
 
     # Создаём окно в котором можно выбрать свои крайние даты для графика
     root = Tk()
+    root.title("Выбор периода")
+    root.geometry("300x100")
+
+
+    root.mainloop()
 
 
     return start_date, stop_date
