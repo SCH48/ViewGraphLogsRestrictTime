@@ -44,11 +44,9 @@ def draw_diag(time_content):
     """ Рисуем диаграмму по набору дат """
     print("Рисуем",time_content)
 
-
 #######################################################################
 
 list_all_dates = get_all_dates(foldernamelog,dateFormat_file_name) # Получаем список всех дат
 start_stop_dates = choose_dates(list_all_dates) # Рисуем окно с выбором начальной и конечной даты
 time_content = get_data_from_files(start_stop_dates)# Получаем крайние даты и вытаскиваем из всех файлов этого периода время
 draw_diag(time_content) # Рисуем диаграмму по полученным временам.
-
