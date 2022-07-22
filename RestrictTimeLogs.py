@@ -2,6 +2,8 @@ import os
 from datetime import date,datetime,timedelta
 import dateutil.relativedelta as rltd
 from tkinter import *
+from tkcalendar import Calendar, DateEntry
+
 
 foldernamelog = "LOGS"
 
@@ -30,29 +32,34 @@ def correct_start_stop_dates (start_stop_dates):
     """ Виджет изменения начальных дат"""
         # Создаём окно в котором можно выбрать свои крайние даты для графика
     Ww = Tk()
-    Ww.title("Статистика посещения")
+    Ww.title("Статистика посещений")
     
     lblTop = Label(Ww, text="Выберите период отображения", font='bold', fg='blue')
-    lblTop.grid(row=0,  column=0,  columnspan=4, padx=50, pady=10) 
+    lblTop.grid(row=0,  column=0,  columnspan=4, padx=100, pady=10) 
 
-    lblBegin = Label(Ww,text="Начало: ")
-    lblBegin.grid(row=1,  column=0,  padx=5, pady=5)
-    entryBegin = Entry(Ww, width=10)
-    entryBegin .grid(row=1, column=1)
+    #start date
+    start_date = start_stop_dates[0]
+    lblBegin = Label(Ww,text="Начало:")
+    lblBegin.grid(row=1,  column=0, sticky=E)
+    entryBegin = DateEntry(Ww, year=start_date.year, month=start_date.month, day=start_date.day)
+    entryBegin.grid(row=1, column=1, sticky=W)
 
-    lblEnd =Label(Ww, text="Конец:")
-    lblEnd.grid(row=1,  column=2, padx=5, pady=5)
-    entryEnd = Entry(Ww, width=10) 
-    entryEnd.grid(row=1, column=3 )
+    #stop date
+    stop_date = start_stop_dates[1]
+    lblEnd = Label(Ww, text="Конец:")
+    lblEnd.grid(row=1,  column=2, sticky=E)
+    entryEnd = DateEntry(Ww, year=stop_date.year, month=stop_date.month, day=stop_date.day)
+    entryEnd.grid(row=1, column=3, sticky=W)
 
-    btnOK = Button(Ww, text=u'Применить' )
-    btnOK.grid(row=2,column=1, pady=20)
-    btnCancel = Button(Ww, text="Отменить")
+    btnOK = Button(Ww, text='Применить' )
+    btnOK.grid(row=2, column=1, pady=20)
+    btnCancel = Button(Ww, text='Отменить' )
     btnCancel.grid(row=2, column=2, pady=20)
     
+
     Ww.mainloop()
 
-    return start_date, stop_date
+    return start_stop_dates
     
 def get_times_from_files(start_stop_dates, datetimeFormatInFiles):
     """ Получаем данные из файлов с заданным диапазоном дат """
