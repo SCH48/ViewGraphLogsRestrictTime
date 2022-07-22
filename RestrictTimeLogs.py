@@ -5,7 +5,7 @@ from tkinter import *
 
 foldernamelog = "LOGS"
 
-# Функции
+# Functions
 def get_all_dates(foldernamelog, dateFormat_file_name):
     """ Получить все даты файлов в папке с логами Даты содержатся в имени файлов  """
 
