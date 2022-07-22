@@ -1,12 +1,9 @@
-# Библиотеки
 import os
 from datetime import date,datetime,timedelta
 import dateutil.relativedelta as rltd
 from tkinter import *
 
-# Переменные
 foldernamelog = "LOGS"
-datetimeFormat_InLog = "%d.%m.%Y %H:%M:%S"
 
 # Функции
 def get_all_dates(foldernamelog, dateFormat_file_name):
@@ -57,7 +54,7 @@ def correct_start_stop_dates (start_stop_dates):
 
     return start_date, stop_date
     
-def get_times_from_files(start_stop_dates):
+def get_times_from_files(start_stop_dates, datetimeFormatInFiles):
     """ Получаем данные из файлов с заданным диапазоном дат """
     return start_stop_dates
 
@@ -70,7 +67,7 @@ def draw_diag(time_content):
 list_all_dates = get_all_dates(foldernamelog,"%Y-%m-%d") # Получаем список всех дат из имён файлов по формату
 start_stop_dates = get_start_stop_dates(list_all_dates) # Получаем начальную и конечную даты диапазона выбора
 start_stop_dates = correct_start_stop_dates(start_stop_dates) # Корректируем диапазон дат с помощью виджета
-time_content = get_times_from_files(start_stop_dates) # Вытаскиваем  из всех файлов заданного периода время
+time_content = get_times_from_files(start_stop_dates, "%d.%m.%Y %H:%M:%S") # Вытаскиваем  из всех файлов заданного периода время
 draw_diag(time_content) # Рисуем диаграмму по полученным временам.
 
 
