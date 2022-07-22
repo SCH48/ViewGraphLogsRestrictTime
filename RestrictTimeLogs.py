@@ -1,9 +1,6 @@
 # Библиотеки
-from cmath import e
-from msilib.schema import Font
 import os
 from datetime import date,datetime,timedelta
-from turtle import st
 import dateutil.relativedelta as rltd
 from tkinter import *
 
