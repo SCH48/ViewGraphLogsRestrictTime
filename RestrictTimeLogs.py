@@ -34,22 +34,22 @@ def correct_start_stop_dates (start_stop_dates):
     Ww = Tk()
     Ww.title("Статистика посещений")
     
-    lblTop = Label(Ww, text="Выберите период отображения", font='bold', fg='blue')
+    lblTop = Label(Ww, text="Выберите период", font='bold', fg='blue')
     lblTop.grid(row=0,  column=0,  columnspan=4, padx=100, pady=10) 
 
     #start date
-    start_date = start_stop_dates[0]
     lblBegin = Label(Ww,text="Начало:")
     lblBegin.grid(row=1,  column=0, sticky=E)
-    entryBegin = DateEntry(Ww, cursor="hand2", year=start_date.year, month=start_date.month, day=start_date.day)
+    entryBegin = DateEntry(Ww, cursor="hand2")
+    entryBegin.set_date(start_stop_dates[0])
     entryBegin.grid(row=1, column=1, sticky=W)
 
     #stop date
-    stop_date = start_stop_dates[1]
-    lblEnd = Label(Ww, text="Конец:")
-    lblEnd.grid(row=1,  column=2, sticky=E)
-    entryEnd = DateEntry(Ww, cursor="hand2", year=stop_date.year, month=stop_date.month, day=stop_date.day)
-    entryEnd.grid(row=1, column=3, sticky=W)
+    lblBegin = Label(Ww,text="Начало:")
+    lblBegin.grid(row=1,  column=2, sticky=E)
+    entryBegin = DateEntry(Ww, cursor="hand2")
+    entryBegin.set_date(start_stop_dates[1])
+    entryBegin.grid(row=1, column=3, sticky=W)
 
     btnOK = Button(Ww, text='Применить' )
     btnOK.grid(row=2, column=1, pady=20)
