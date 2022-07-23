@@ -11,7 +11,7 @@ day = now.day
 # Create Object
 root = Tk()
 root.title("Календарь")
-root.geometry("300x300")
+root.geometry("300x350")
 cal = Calendar(root, selectmode='day', year=year, month=month, day=day)
 cal.pack()
 

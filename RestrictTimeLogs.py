@@ -38,27 +38,25 @@ def correct_start_stop_dates (start_stop_dates):
     lblTop.grid(row=0,  column=0,  columnspan=4, padx=100, pady=10) 
 
     #start date
-    lblBegin = Label(Ww,text="Начало:")
-    lblBegin.grid(row=1,  column=0, sticky=E)
-    entryBegin = DateEntry(Ww, cursor="hand2")
-    entryBegin.set_date(start_stop_dates[0])
-    entryBegin.grid(row=1, column=1, sticky=W)
+    lblStart = Label(Ww,text="Начало:")
+    lblStart.grid(row=1,  column=0, sticky=E)
+    entryStart = DateEntry(Ww, cursor="hand2")
+    entryStart.set_date(start_stop_dates[0])
+    entryStart.grid(row=1, column=1, sticky=W)
 
     #stop date
-    lblBegin = Label(Ww,text="Начало:")
-    lblBegin.grid(row=1,  column=2, sticky=E)
-    entryBegin = DateEntry(Ww, cursor="hand2")
-    entryBegin.set_date(start_stop_dates[1])
-    entryBegin.grid(row=1, column=3, sticky=W)
+    lblStop = Label(Ww,text="Конец:")
+    lblStop.grid(row=1,  column=2, sticky=E)
+    entryStop = DateEntry(Ww, cursor="hand2")
+    entryStop.set_date(start_stop_dates[1])
+    entryStop.grid(row=1, column=3, sticky=W)
 
-    btnOK = Button(Ww, text='Применить' )
-    btnOK.grid(row=2, column=1, pady=20)
-    btnCancel = Button(Ww, text='Отменить' )
-    btnCancel.grid(row=2, column=2, pady=20)
-    
+    btnOK = Button(Ww, text='Применить', command=exit() )
+    btnOK.grid(row=2, column=1, columnspan=2, pady=20, sticky=NSEW )
+      
     Ww.mainloop()
 
-    return start_stop_dates
+    return entryStart.get(), entryStop.get()
     
 def get_times_from_files(start_stop_dates, datetimeFormatInFiles):
     """ Получаем данные из файлов с заданным диапазоном дат """
