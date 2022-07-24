@@ -3,6 +3,8 @@ from datetime import date,datetime,timedelta
 import dateutil.relativedelta as rltd
 from tkinter import *
 from tkcalendar import Calendar, DateEntry
+import matplotlib.pyplot as plt
+import matplotlib.dates as matd
 #######################################################################
 foldernamelog = "LOGS"
 dateFormat_file_name = "%Y-%m-%d"
@@ -23,8 +25,8 @@ def get_all_dates(foldernamelog, dateFormat_file_name):
 def get_start_stop_dates(list_all_dates):
     """ Получаем границы дат как последняя доступная минус 1 месяц   """
     stop_date = list_all_dates[-1]
-    # start_date = stop_date - timedelta(days=30)
-    start_date = stop_date - rltd.relativedelta(months=1)
+    start_date = stop_date - timedelta(days=7)
+    #start_date = stop_date - rltd.relativedelta(months=1)
     return start_date, stop_date
     
 def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles):
@@ -46,8 +48,27 @@ def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_n
 
 def draw_diag(time_content):
     """ Рисуем диаграмму """
-    print("Рисуем", len(time_content))
+    print("Рисуем точек = ", len(time_content))
+    minutes_in_day = 1440
+    num_days = (time_content[-1]-time_content[0]).days + 1
+    print ("Дней = ", num_days)
+
     
+    x = matd.date2num(time_content)
+    y = list(map(lambda t:  datetime.strftime( t,  "%H-%M-%S" ), time_content))
+    
+
+    plt.plot_date(x,y)
+        
+    plt.title("Активность пользователя")
+    plt.xlabel("Даты")
+    plt.ylabel("Время")
+    plt.legend()    
+    plt.show()
+    
+
+
+
 def press_ok():
     """ Нажата 'Применить' получаем диапазон, читаем данные из файлов и отправляем на рисование """
     start_date = entryStart.get_date()
