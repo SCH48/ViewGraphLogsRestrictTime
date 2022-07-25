@@ -1,5 +1,9 @@
+#######################################################################
+# Обработка лога посещения компьютера
+#######################################################################
 import os
 from datetime import date,datetime,timedelta
+from tkinter.font import ITALIC
 import dateutil.relativedelta as rltd
 from tkinter import *
 from tkcalendar import Calendar, DateEntry
@@ -9,6 +13,7 @@ import matplotlib.dates as matd
 foldernamelog = "LOGS"
 dateFormat_file_name = "%Y-%m-%d"
 datetimeFormatInFiles =  "%d.%m.%Y %H:%M:%S"
+minutes_in_day = 1440
 #######################################################################
 # Functions
 #######################################################################
@@ -23,9 +28,9 @@ def get_all_dates(foldernamelog, dateFormat_file_name):
     return listdates
 
 def get_start_stop_dates(list_all_dates):
-    """ Получаем границы дат как последняя доступная минус 1 месяц   """
+    """ Получаем начальные границы дат как последняя доступная минус что-то  """
     stop_date = list_all_dates[-1]
-    start_date = stop_date - timedelta(days=7)
+    start_date = stop_date - timedelta(days=3)
     #start_date = stop_date - rltd.relativedelta(months=1)
     return start_date, stop_date
     
@@ -46,70 +51,96 @@ def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_n
                         time_content.append(time_from_str)
     return time_content
 
-def draw_diag(time_content):
+def get_times_from_date(time_content, curday):
+    #times =[]
+    minutes = []
+    for DT in time_content:
+            if DT.date() == curday:
+                t = DT.time()
+                m = t.hour * 60 + t.minute          # минута дня
+                #times.append(t)
+                minutes.append(m)
+
+    return  minutes
+
+def draw_diag(time_content, start_date, stop_date):
     """ Рисуем диаграмму """
-    print("Рисуем точек = ", len(time_content))
-    minutes_in_day = 1440
-    num_days = (time_content[-1]-time_content[0]).days + 1
-    print ("Дней = ", num_days)
+    num_days = (stop_date - start_date).days +1
+    print( "Рисуем", num_days, "дн. с", start_date, "по", stop_date, ", Точек  =", len(time_content), "шт. ")
 
+    # ?: Думаем как будем выводить данные
     
-    x = matd.date2num(time_content)
-    y = list(map(lambda t:  datetime.strftime( t,  "%H-%M-%S" ), time_content))
-    
+    datatimes = []
+    datadays = []
+    curday = start_date
+    while curday <= stop_date:
+        datadays.append(curday)
+        curtimes = get_times_from_date(time_content, curday) # получить из time_content все минуты текущего дня
+        datatimes.append(curtimes)
+        curday =curday+timedelta(days=1)
 
+    # ?: Думаем как будем выводить данные    
+    print(datadays, datatimes)
+
+    # TODO: рисование
+    
+    x = matd.date2num(datadays)
+    y = datatimes
+    
     plt.plot_date(x,y)
-        
     plt.title("Активность пользователя")
     plt.xlabel("Даты")
     plt.ylabel("Время")
     plt.legend()    
+    plt.gcf().autofmt_xdate()
     plt.show()
-    
-
-
-
+ 
 def press_ok():
-    """ Нажата 'Применить' получаем диапазон, читаем данные из файлов и отправляем на рисование """
+    """ Получаем диапазон дат, читаем данные из файлов и отправляем на рисование """
     start_date = entryStart.get_date()
     stop_date =  entryStop.get_date()
     time_content = get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles) 
-    draw_diag(time_content)
+    draw_diag(time_content, start_date, stop_date)
 
 #######################################################################
 # MAIN SCRIPT
 #######################################################################
-
 # Получаем список всех дат из имён файлов по формату
 list_all_dates = get_all_dates(foldernamelog, dateFormat_file_name) 
-
 # Получаем начальную и конечную даты диапазона выбора
-start_stop_dates = get_start_stop_dates(list_all_dates) 
+start_date, stop_date = get_start_stop_dates(list_all_dates) 
 
-# Корректируем диапазон дат с помощью виджета и по кнопке Применить рисуем диаграмму
-Ww = Tk()
-Ww.title("Статистика посещений")
-    
-lblTop = Label(Ww, text="Выберите период", font='bold', fg='blue')
-lblTop.grid(row=0,  column=0,  columnspan=4, padx=100, pady=10) 
+# Корректируем диапазон дат с помощью виджета и по кнопке рисуем диаграмму
+root = Tk()
+root.resizable(width=False, height=False)
+root.title("Статистика посещений")
 
- #start date
-lblStart = Label(Ww,text="Начало:")
-lblStart.grid(row=1,  column=0, sticky=E)
-entryStart = DateEntry(Ww, cursor="hand2")
-entryStart.set_date(start_stop_dates[0])
-entryStart.grid(row=1, column=1, sticky=W)
+lblTop = Label(root, text="Выберите период", font='Arial 13 bold')
+lblTop.pack(side=TOP, padx=100, pady=5)
 
-#stop date
-lblStop = Label(Ww,text="Конец:")
-lblStop.grid(row=1,  column=2, sticky=E)
-entryStop = DateEntry(Ww, cursor="hand2")
-entryStop.set_date(start_stop_dates[1])
-entryStop.grid(row=1, column=3, sticky=W)
+# Диапазон доступных дат
+txt_start = datetime.strftime(list_all_dates[0],"%d.%m.%Y")
+txt_stop = datetime.strftime(list_all_dates[-1],"%d.%m.%Y")
+text_period_dat = "Доступны даты с {} по {}.".format(txt_start, txt_stop)
+lblDates = Label(root,text=text_period_dat, font=("Arial 11 italic"))
+lblDates.pack(side=TOP)
 
-btnOK = Button(Ww, text='Применить', command=press_ok)
-btnOK.grid(row=2, column=1, columnspan=2, pady=20, sticky=NSEW )
-    
-Ww.mainloop()
+# Выбор начальной даты
+lblStart = Label(root,text="Начало:")
+lblStart.pack(side=LEFT, padx=5)
+entryStart = DateEntry(root, cursor="hand2")
+entryStart.set_date(start_date)
+entryStart.pack(side=LEFT)
 
+# Выбор конечной даты
+lblStop = Label(root,text=" Конец:")
+lblStop.pack(side=LEFT,  padx=5)
+entryStop = DateEntry(root, cursor="hand2")
+entryStop.set_date(stop_date)
+entryStop.pack(side=LEFT)
+
+btnOK = Button(root, text='Нарисовать', bg= "#408080", fg="#a8e824", activebackground="yellow", activeforeground="red", command=press_ok)
+btnOK.pack(side=BOTTOM, padx=15, pady=10)
+   
+root.mainloop()
 #######################################################################
