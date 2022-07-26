@@ -43,12 +43,14 @@ def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_n
             datefile = datetime.strptime(filename, dateFormat_file_name)
             if ( start_date <= datefile.date() <= stop_date ):
                 # читаем строчки со временем из файла  в  time_content
-                with open( foldernamelog + "\\" + file, "r") as fileobject:
+                with open( foldernamelog + "\\" + file, "r",  encoding='cp866') as fileobject:
                     # итерация по строкам
                     for line in fileobject:
-                        str = line[:18]
-                        time_from_str = datetime.strptime(str,datetimeFormatInFiles)
-                        time_content.append(time_from_str)
+                        # нам нужны только строки со словами "осталось" с 21по28 позицию
+                        if  line[20:28] == "осталось":
+                            str = line[:19]
+                            time_from_str = datetime.strptime(str,datetimeFormatInFiles)
+                            time_content.append(time_from_str)
     return time_content
 
 def get_times_from_date(time_content, curday):
@@ -83,7 +85,7 @@ def draw_diag(time_content, start_date, stop_date):
         # получим из time_content  минуты дня и их кол-во 
         list_times_day, list_minutes_day = get_times_from_date(time_content, curday) 
         list_txt_times_day = parsed_timelist_to_string(list_times_day)
-        q_minutes_day = len(list_minutes_day)-1
+        q_minutes_day = len(list_minutes_day)
         # добавим полученное в списки
         list_days.append(curday)
         list_times.append(list_times_day)    
@@ -93,6 +95,7 @@ def draw_diag(time_content, start_date, stop_date):
      
     # ?: Думаем как будем выводить данные    
     print(parsed_timelist_to_string(list_days))    
+    print(list_minutes)    
     print(list_q_minutes)
 
     # TODO: рисование
