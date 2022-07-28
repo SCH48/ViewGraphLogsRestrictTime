@@ -9,6 +9,7 @@ from tkinter import *
 from tkcalendar import Calendar, DateEntry
 import matplotlib.pyplot as plt
 import matplotlib.dates as matd
+import re
 #######################################################################
 foldernamelog = "LOGS"
 dateFormat_file_name = "%Y-%m-%d"
@@ -45,13 +46,16 @@ def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_n
                 # читаем строчки со временем из файла  в  time_content
                 with open( foldernamelog + "\\" + file, "r",  encoding='cp866') as fileobject:
                     # итерация по строкам
+
+                    # TODO: разобраться с регулярными выражениями
                     for line in fileobject:
-                        # нам нужны только строки со словами "осталось" в нужном месте
-                        #? ищем регулярное выражение!!!
-                        if  line[19:29] == "осталось":
-                            str = line[:19]
-                            time_from_str = datetime.strptime(str,datetimeFormatInFiles)
+                        # ? нам нужны только строки со словами "осталось" в нужном месте
+                        if re.search('[^,].осталось', line):
+                            match = re.search (r'\d+.){2}\d{4}.\d+(:\d+){2}', line)    #?дата со временем в начале строки
+                            time_from_str = datetime.strptime(match.group(),datetimeFormatInFiles)
                             time_content.append(time_from_str)
+    
+    
     return time_content
 
 def get_times_from_day(time_content, curday):
