@@ -1,6 +1,7 @@
 #######################################################################
 # Обработка лога посещения компьютера
 #######################################################################
+
 import os
 from datetime import date,datetime,timedelta
 from tkinter.font import ITALIC
@@ -10,13 +11,15 @@ from tkcalendar import Calendar, DateEntry
 import matplotlib.pyplot as plt
 import matplotlib.dates as matd
 import re
+
 #######################################################################
-foldernamelog = "LOGS"
-dateFormat_file_name = "%Y-%m-%d"
-datetimeFormatInFiles =  "%d.%m.%Y %H:%M:%S"
-default_days = 2
+foldernamelog = "LOGS"                                             # имя папки с логами
+dateFormat_file_name = "%Y-%m-%d"                       # формат даты в имени файла лога
+datetimeFormatInFiles =  "%d.%m.%Y %H:%M:%S"    # формат даты внутри файла
+default_days = 2    # ?временный параметр кол-во дней по-умолчанию для диаграммы 
+
 #######################################################################
-# Functions
+# Функции
 #######################################################################
 def get_all_dates(foldernamelog, dateFormat_file_name):
     """ Получить все даты файлов в папке с логами Даты содержатся в имени файлов  """
@@ -29,10 +32,16 @@ def get_all_dates(foldernamelog, dateFormat_file_name):
     return listdates
 
 def get_start_stop_dates(list_all_dates):
-    """ Получаем начальные границы дат как последняя доступная минус что-то  """
-    stop_date = list_all_dates[-1]
+    """ Получаем начальные границы дат как последняя доступная минус что-то  
+        (Пока не решил это будет фиксированное кол-во дней или минус 1 месяц)
+    """
+    stop_date = list_all_dates[-1]  # последняя дата есть последняя дата в журнале
+    
+    # начальная дата диаграммы есть последняя минус default_days
     start_date = stop_date - timedelta(days=default_days)
-    #start_date = stop_date - rltd.relativedelta(months=1)
+    # ?или же будет  минус 1 месяц
+    # start_date = stop_date - rltd.relativedelta(months=1)
+    
     return start_date, stop_date
     
 def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles):
@@ -43,19 +52,24 @@ def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_n
             filename = file.split(".")[0]
             datefile = datetime.strptime(filename, dateFormat_file_name)
             if ( start_date <= datefile.date() <= stop_date ):
+               
                 # читаем строчки со временем из файла  в  time_content
                 with open( foldernamelog + "\\" + file, "r",  encoding='cp866') as fileobject:
-                    # итерация по строкам
+                    cur_minute = 0; pred_minute = 0
+                    for line in fileobject:  # итерация по строкам    
+                        # считать последнюю цифру в строке, сравнить с предыдущей минутой,
+                        # если не равны, то это наше время, читаем его из строки и отминусовываем текущий остаток минут
+                        # если одинаковые, то пропускаем строку
+                        
 
-                    # TODO: разобраться с регулярными выражениями
-                    for line in fileobject:
-                        # ? нам нужны только строки со словами "осталось" в нужном месте
-                        if re.search('[^,].осталось', line):
-                            match = re.search (r'\d+.){2}\d{4}.\d+(:\d+){2}', line)    #?дата со временем в начале строки
-                            time_from_str = datetime.strptime(match.group(),datetimeFormatInFiles)
-                            time_content.append(time_from_str)
-    
-    
+                    
+                    
+                    
+                            #match = re.search (r'\d+.){2}\d{4}.\d+(:\d+){2}', line)    #?дата со временем в начале строки
+                            
+                            
+                            #time_from_str = datetime.strptime(match.group(),datetimeFormatInFiles)
+                            #time_content.append(time_from_str)
     return time_content
 
 def get_times_from_day(time_content, curday):
@@ -102,42 +116,55 @@ def draw_diag(time_content, start_date, stop_date):
     print(parsed_timelist_to_string(list_days))    
     print(list_txt_minutes)    
     print(list_q_minutes)
-
+    
+    """ 
     # TODO: рисование
-    
-    # fig, ax = plt.subplots()
-    # ax.set_title("Активность пользователя")
-    # fig.suptitle("График")
-    # #x = matd.date2num(datadays)
-    # x = datadays
-    # y = datatimes
-    
-    # ax.hist(datadays, bins = 50, rwidth = 0.4)
+        # fig, ax = plt.subplots()
+        # ax.set_title("Активность пользователя")
+        # fig.suptitle("График")
+        # #x = matd.date2num(datadays)
+        # x = datadays
+        # y = datatimes
+        
+        # ax.hist(datadays, bins = 50, rwidth = 0.4)
 
-    # plt.plot_date(x,y)
-    # plt.title("Активность пользователя")
-    # plt.xlabel("Даты")
-    # plt.ylabel("Время")
-    # plt.legend()    
-    # plt.gcf().autofmt_xdate()
-    # plt.show()
- 
+        # plt.plot_date(x,y)
+        # plt.title("Активность пользователя")
+        # plt.xlabel("Даты")
+        # plt.ylabel("Время")
+        # plt.legend()    
+        # plt.gcf().autofmt_xdate()
+        # plt.show()
+    """
+
 def press_ok():
-    """ Получаем диапазон дат, читаем данные из файлов и отправляем на рисование """
+    """ Обработчик кнопки "Нарисовать" главного окна.
+        Читаем диапазон дат, получаем данные из файлов и запускаем рисование       
+    """
+    # Получаем диапазон дат из гланого окна
     start_date = entryStart.get_date()
     stop_date =  entryStop.get_date()
+    
+    # Читаем данные из файлов
     time_content = get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles) 
+    
+    # Рисуем контент
     draw_diag(time_content, start_date, stop_date)
 
 #######################################################################
 # MAIN SCRIPT
 #######################################################################
-# Получаем список всех дат из имён файлов по формату
-list_all_dates = get_all_dates(foldernamelog, dateFormat_file_name) 
-# Получаем начальную и конечную даты диапазона выбора
-start_date, stop_date = get_start_stop_dates(list_all_dates) 
 
-# Корректируем диапазон дат с помощью виджета и по кнопке рисуем диаграмму
+# Список всех возможных дат из имён файлов, 
+# пока только для одной цели - найти крайние возможные даты которые видны в сообщении
+# TODO: хотелось их как-то помечать в календаре что на эту дату есть данные
+list_all_dates = get_all_dates(foldernamelog, dateFormat_file_name)  
+ 
+ # Получаем начальную и конечную даты для диаграммы вычислением от ближайшей минус что-то
+start_date, stop_date = get_start_stop_dates(list_all_dates)                
+
+# Рисуем форму для корректировки диапазона дат с помощью виджета календаря 
+# и по кнопке "Нарисовать" запускаем рисование диаграммы через press_ok()
 root = Tk()
 root.resizable(width=False, height=False)
 root.title("Статистика посещений")
