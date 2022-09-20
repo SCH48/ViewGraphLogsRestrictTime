@@ -13,9 +13,10 @@ import matplotlib.dates as matd
 import re
 
 #######################################################################
-foldernamelog = "LOGS"                                             # имя папки с логами
-dateFormat_file_name = "%Y-%m-%d"                       # формат даты в имени файла лога
-datetimeFormatInFiles =  "%d.%m.%Y %H:%M:%S"    # формат даты внутри файла
+foldernamelog = "LOGS"                                              # имя папки с логами
+dateFormat_file_name = "%Y-%m-%d"                        # формат даты в имени файла лога
+dateFormatInFiles =  "%d.%m.%Y"                               # формат даты внутри файла
+datetimeFormatInFiles =  "%d.%m.%Y %H:%M:%S"    # формат даты со временем внутри файла
 default_days = 2    # ?временный параметр кол-во дней по-умолчанию для диаграммы 
 
 #######################################################################
@@ -45,7 +46,7 @@ def get_start_stop_dates(list_all_dates):
     return start_date, stop_date
     
 def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles):
-    """ Получить данные из файлов с заданным диапазоном дат """
+    """ Получить данные времени из файлов с заданным диапазоном дат """
     time_content = []
     for file in os.listdir(foldernamelog):
         if file.endswith(".log"):
@@ -53,23 +54,25 @@ def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_n
             datefile = datetime.strptime(filename, dateFormat_file_name)
             if ( start_date <= datefile.date() <= stop_date ):
                
-                # читаем строчки со временем из файла  в  time_content
+                # Читаем строчки со временем из файла  в  time_content
                 with open( foldernamelog + "\\" + file, "r",  encoding='cp866') as fileobject:
-                    cur_minute = 0; pred_minute = 0
-                    for line in fileobject:  # итерация по строкам    
-                        # считать последнюю цифру в строке, сравнить с предыдущей минутой,
-                        # если не равны, то это наше время, читаем его из строки и отминусовываем текущий остаток минут
-                        # если одинаковые, то пропускаем строку
+                   
+                   # Флаг повторного значения минут
+                   pred_min_remaind = 0 
+                   
+                   # Разбираем строку как <Дата> <Час>:<Минута>:.....<Осталось минут>
+                   for line in fileobject: 
+                        # Осталось минут в день
+                        cur_min_remaind = int( re.search(r'(\d{1,2})$', line)[0] )
+                        # если минут как в предыдущей строке то пропускаем строку
+                        if pred_min_remaind == cur_min_remaind: 
+                            continue
                         
+                        pred_min_remaind = cur_min_remaind
+                        # Дата в строке
+                        cur_date_in_str  =  datetime.strptime( re.search(r'\d{2}\.\d{2}\.\d{4}.\d{1,2}:\d{2}:\d{2}', line)[0], datetimeFormatInFiles ) 
+                        time_content.append( cur_date_in_str )
 
-                    
-                    
-                    
-                            #match = re.search (r'\d+.){2}\d{4}.\d+(:\d+){2}', line)    #?дата со временем в начале строки
-                            
-                            
-                            #time_from_str = datetime.strptime(match.group(),datetimeFormatInFiles)
-                            #time_content.append(time_from_str)
     return time_content
 
 def get_times_from_day(time_content, curday):
@@ -93,12 +96,14 @@ def parsed_timelist_to_string(listtimes):
 
 def draw_diag(time_content, start_date, stop_date):
     """ Рисуем графики """
-    num_days = (stop_date - start_date).days +1
+    #num_days = (stop_date - start_date).days +1
+    num_days = (time_content - start_date).days +1
     print( "Рисуем", num_days, "дн. с", start_date, "по", stop_date, ", Точек  =", len(time_content), "шт. ")
   
-    # Получаем список дней,  списки времён посещения, списки минут дня и кол-во минут в день
+    # Получаем список дней,  списки времён посещения, списки минут дня и кол-во оставшихся минут в день
     list_days = [];  list_times = []; list_minutes = []; list_txt_minutes = []; list_q_minutes = []
 
+    # Перебираем все 
     # Перебираем день за днём от start_date до stop_date
     for curday in (start_date + timedelta(n) for n in range(num_days)):
         # получим из time_content  минуты дня и их кол-во 
@@ -113,9 +118,9 @@ def draw_diag(time_content, start_date, stop_date):
         list_q_minutes.append(q_minutes_day)
      
     # ?: Думаем как будем выводить данные    
-    print(parsed_timelist_to_string(list_days))    
-    print(list_txt_minutes)    
-    print(list_q_minutes)
+    print("Список дней", parsed_timelist_to_string(list_days))    
+    print("Минуты", list_txt_minutes)    
+    print("Q", list_q_minutes)
     
     """ 
     # TODO: рисование
@@ -142,15 +147,13 @@ def press_ok():
         Читаем диапазон дат, получаем данные из файлов и запускаем рисование       
     """
     # Получаем диапазон дат из гланого окна
-    start_date = entryStart.get_date()
-    stop_date =  entryStop.get_date()
-    
+    start_date = entryStart.get_date();   stop_date =  entryStop.get_date()
     # Читаем данные из файлов
     time_content = get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles) 
-    
     # Рисуем контент
+    #print(time_content[-1], time_content[0])
     draw_diag(time_content, start_date, stop_date)
-
+    
 #######################################################################
 # MAIN SCRIPT
 #######################################################################
