@@ -4,14 +4,21 @@
 
 import os
 from datetime import date,datetime,timedelta
-from tkinter.font import ITALIC
 import dateutil.relativedelta as rltd
+
+from tkinter.font import ITALIC
 from tkinter import *
 from tkcalendar import Calendar, DateEntry
-import pylab
-import matplotlib.pyplot as plt
-import matplotlib.dates as matd
-import re
+
+import re #регулярные выражения
+
+import plotly
+import plotly.express as px
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
+#import numpy as np
+#import pandas as pd
 
 #######################################################################
 foldernamelog = "LOGS"                                              # имя папки с логами
@@ -90,27 +97,19 @@ def separate_date(list_times):
         sep_times.append(DT.time())
     return sep_dates, sep_times
 
-def graph_q_minutes1(xdata, ydata):
-    """ Отображение используемых минут"""
-    # Преобразуем даты в числовой формат
-    xdata_float = matd.date2num (xdata)
-    # Вызовем subplot явно, чтобы получить экземпляр класса AxesSubplot,
-    # из которого будем иметь доступ к осям
-    axes = pylab.subplot(1, 1, 1)
-    # Пусть в качестве меток по оси X выводится только год
-    axes.xaxis.set_major_formatter (matd.DateFormatter("%d.%m"))
-    # Отобразим данные
-    pylab.plot_date (xdata_float, ydata, fmt="bo")
-    pylab.grid()
-    pylab.show()
-
-def graph_q_minutes2(xdata, ydata):
-    """ Рисуем гистограмму используемые минуты """
+def graph_px(xdata, ydata):
+    """ Рисуем гистограмму используемых минут """
     print(xdata,ydata)
-
-def graph_use_time(xdata,ydata):
-    """ Рисуем матрицу времени"""
-    print("График")
+    
+    fig = px.bar(x=xdata, y=ydata)
+    fig.show()
+    
+def graph_go(xdata, ydata):
+    """ Рисуем гистограмму используемых минут """
+    
+    
+    
+    
 
 def do_diag(time_content):
     """ Готовим данные для  графиков и вызываем их рисования"""
@@ -126,7 +125,8 @@ def do_diag(time_content):
     #for curday in (start_date + timedelta(n) for n in range(num_days)):
         #list_days.append(curday.date())
 
-    #  НО для ускорения бежим по контенту и формируем списки одним проходом
+    #  НО для ускорения бежим по контенту и формируем списки за один проход
+    # ? а нужны ли эти списки ? 
     curDate = time_content[0].date();   curMinutes = []
     
     for curDT in  time_content:
@@ -142,7 +142,7 @@ def do_diag(time_content):
         list_minutes.append(curMinutes)
         list_q_minutes.append(len(curMinutes)) 
         # обнуляемся
-        curDate = curDT.date()
+        curDate = curDate + timedelta(days=1)
         curMinutes = []
     
     # последний день тоже дописать в списки
@@ -154,10 +154,10 @@ def do_diag(time_content):
     #print("Список дней", parsed_timelist_to_string(list_days))    
     #print("Q", list_q_minutes)
 
-    #graph_q_minutes1(list_days,list_q_minutes)
-    #graph_q_minutes1(list_days,list_minutes)
-    #graph_q_minutes2(list_days,list_q_minutes)
-    #graph_use_time(list_days,list_minutes)
+    graph_px(list_days,list_q_minutes)
+    #graph_go(list_days,list_minutes)
+    #graph(time_content)
+    
     
     
 def press_ok():
