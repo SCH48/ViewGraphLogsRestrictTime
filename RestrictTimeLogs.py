@@ -8,6 +8,7 @@ from tkinter.font import ITALIC
 import dateutil.relativedelta as rltd
 from tkinter import *
 from tkcalendar import Calendar, DateEntry
+import pylab
 import matplotlib.pyplot as plt
 import matplotlib.dates as matd
 import re
@@ -81,23 +82,52 @@ def parsed_timelist_to_string(listtimes):
         parsed_times.append(t_parsed)
     return parsed_times
 
-def draw_diag(time_content):
-    """ Рисуем графики по списку времён """
-    start_date = time_content[0] 
-    stop_date = time_content[-1]
+def separate_date(list_times):
+    """ разделить формат времни на два списка дат и времён """
+    sep_dates = []; sep_times = []
+    for DT in list_times:
+        sep_dates.append(DT.date())
+        sep_times.append(DT.time())
+    return sep_dates, sep_times
+
+def graph_q_minutes1(xdata, ydata):
+    """ Отображение используемых минут"""
+    # Преобразуем даты в числовой формат
+    xdata_float = matd.date2num (xdata)
+    # Вызовем subplot явно, чтобы получить экземпляр класса AxesSubplot,
+    # из которого будем иметь доступ к осям
+    axes = pylab.subplot(1, 1, 1)
+    # Пусть в качестве меток по оси X выводится только год
+    axes.xaxis.set_major_formatter (matd.DateFormatter("%d.%m"))
+    # Отобразим данные
+    pylab.plot_date (xdata_float, ydata, fmt="bo")
+    pylab.grid()
+    pylab.show()
+
+def graph_q_minutes2(xdata, ydata):
+    """ Рисуем гистограмму используемые минуты """
+    print(xdata,ydata)
+
+def graph_use_time(xdata,ydata):
+    """ Рисуем матрицу времени"""
+    print("График")
+
+def do_diag(time_content):
+    """ Готовим данные для  графиков и вызываем их рисования"""
+    start_date = time_content[0];  stop_date = time_content[-1]
     num_days = (stop_date - start_date).days +1
-    print( "Рисуем", num_days, "дн. с", start_date.date(), "по",stop_date.date(), ", Точек  =", len(time_content), "шт. ")
+    print( "Выбрано:", num_days, "дн. с", start_date.date(), "по",stop_date.date(), ", Точек  =", len(time_content), "шт. ")
       
-    # Список дней,  списки минут и оставшихся минут в день
+    # Определяем Список дней,  Списки минут и Список оставшихся минут в день
     list_days = [];  list_minutes = []; list_q_minutes = []
 
-    # Список дней по-быстрому (оставлено для образца)
+    # Список дней по-быстрому, но если есть пропуски в днях то формируется неверно
+    # ?оставлено для образца
     #for curday in (start_date + timedelta(n) for n in range(num_days)):
         #list_days.append(curday.date())
 
-    #  Бежим по контенту и формируем списки (одним проходом для ускорения)
-    curDate = time_content[0].date() 
-    curMinutes = []
+    #  НО для ускорения бежим по контенту и формируем списки одним проходом
+    curDate = time_content[0].date();   curMinutes = []
     
     for curDT in  time_content:
     
@@ -106,8 +136,8 @@ def draw_diag(time_content):
             m = t.hour * 60 + t.minute          # номер минуты от начала дня 
             curMinutes.append(m)
             continue
-        
-        # новый день, подводим итоги 
+    
+        # новый день, подводим итоги в списки
         list_days.append(curDate)
         list_minutes.append(curMinutes)
         list_q_minutes.append(len(curMinutes)) 
@@ -115,33 +145,21 @@ def draw_diag(time_content):
         curDate = curDT.date()
         curMinutes = []
     
-    # последний день тоже в списки
+    # последний день тоже дописать в списки
     list_days.append(curDate)
     list_minutes.append(curMinutes)
     list_q_minutes.append(len(curMinutes)) 
 
-
     # ?: Думаем как будем выводить данные    
-    print("Список дней", parsed_timelist_to_string(list_days))    
-    print("Минуты", list_minutes)    
-    print("Q", list_q_minutes)
-    
-    # TODO: рисование
-    #    fig, ax = plt.subplots()
-    #    ax.set_title("Активность пользователя")
-    #    fig.suptitle("График")
-    #    x = matd.date2num(datadays)
-    #    x = datadays
-    #    y = datatimes
-    #    ax.hist(datadays, bins = 50, rwidth = 0.4)
-    #   plt.plot_date(x,y)
-    #   plt.title("Активность пользователя")
-    #    plt.xlabel("Даты")
-    #    plt.ylabel("Время")
-    #    plt.legend()    
-    #    plt.gcf().autofmt_xdate()
-    #    plt.show() 
+    #print("Список дней", parsed_timelist_to_string(list_days))    
+    #print("Q", list_q_minutes)
 
+    #graph_q_minutes1(list_days,list_q_minutes)
+    #graph_q_minutes1(list_days,list_minutes)
+    #graph_q_minutes2(list_days,list_q_minutes)
+    #graph_use_time(list_days,list_minutes)
+    
+    
 def press_ok():
     """ Обработчик кнопки "Нарисовать" главного окна.
         Читаем диапазон дат, получаем данные из файлов и запускаем рисование       
@@ -151,7 +169,7 @@ def press_ok():
     # Читаем данные из файлов
     time_content = get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles) 
     # Рисуем контент
-    draw_diag(time_content)
+    do_diag(time_content)
     
 #######################################################################
 # MAIN SCRIPT
