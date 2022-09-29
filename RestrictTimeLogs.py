@@ -47,9 +47,9 @@ def init_start_stop_dates(list_all_dates):
      # последняя дата есть последняя дата в журнале
     stop_date = list_all_dates[-1] 
     # начальная дата есть последняя минус default_days
-    start_date = stop_date - timedelta(days=default_days)
+    #start_date = stop_date - timedelta(days=default_days)
     # ?или же будет  минус 1 месяц
-    # start_date = stop_date - rltd.relativedelta(months=1)
+    start_date = stop_date - rltd.relativedelta(months=1)
     
     return start_date, stop_date
     
@@ -97,20 +97,6 @@ def separate_date(list_times):
         sep_times.append(DT.time())
     return sep_dates, sep_times
 
-def graph_px(xdata, ydata):
-    """ Рисуем гистограмму используемых минут """
-    print(xdata,ydata)
-    
-    fig = px.bar(x=xdata, y=ydata)
-    fig.show()
-    
-def graph_go(xdata, ydata):
-    """ Рисуем гистограмму используемых минут """
-    
-    
-    
-    
-
 def do_diag(time_content):
     """ Готовим данные для  графиков и вызываем их рисования"""
     start_date = time_content[0];  stop_date = time_content[-1]
@@ -119,14 +105,13 @@ def do_diag(time_content):
       
     # Определяем Список дней,  Списки минут и Список оставшихся минут в день
     list_days = [];  list_minutes = []; list_q_minutes = []
+    # А также разделим даты, время и минуты
+    list_dates =[]; list_times = []; list_q_times = []
 
-    # Список дней по-быстрому, но если есть пропуски в днях то формируется неверно
-    # ?оставлено для образца
-    #for curday in (start_date + timedelta(n) for n in range(num_days)):
-        #list_days.append(curday.date())
+    # Список дней по-быстрому, но если есть пропуски в днях то формируется неверно #? приведено для образца
+    #####  for curday in (start_date + timedelta(n) for n in range(num_days)): list_days.append(curday.date())
 
     #  НО для ускорения бежим по контенту и формируем списки за один проход
-    # ? а нужны ли эти списки ? 
     curDate = time_content[0].date();   curMinutes = []
     
     for curDT in  time_content:
@@ -134,30 +119,77 @@ def do_diag(time_content):
         if curDT.date() == curDate:
             t = curDT.time()  
             m = t.hour * 60 + t.minute          # номер минуты от начала дня 
+            
             curMinutes.append(m)
+            list_q_times.append(m)
+            list_dates.append(curDT.date())
+            list_times.append(curDT.time())
+
             continue
     
         # новый день, подводим итоги в списки
         list_days.append(curDate)
         list_minutes.append(curMinutes)
         list_q_minutes.append(len(curMinutes)) 
-        # обнуляемся
+        # обнуляем промежуточные данные
         curDate = curDate + timedelta(days=1)
         curMinutes = []
     
-    # последний день тоже дописать в списки
+    # последний день также допишем в списки
     list_days.append(curDate)
     list_minutes.append(curMinutes)
     list_q_minutes.append(len(curMinutes)) 
 
     # ?: Думаем как будем выводить данные    
-    #print("Список дней", parsed_timelist_to_string(list_days))    
-    #print("Q", list_q_minutes)
-
-    graph_px(list_days,list_q_minutes)
-    #graph_go(list_days,list_minutes)
-    #graph(time_content)
+    # Быстрые экспресс диаграммы
+    #(px.bar(x=list_days, y=list_q_minutes)).show()
+    #(px.scatter(x=list_dates, y=list_q_times)).show()
     
+    #  Cетка графиков 
+    
+    fig = go.Figure()
+    
+    # Этот код для двухоконного графика
+    # fig = plotly.subplots.make_subplots(
+    #     rows=2, cols=1,  # 2 строк и 1 столбец
+    #     shared_xaxes=True,  # горизонтальные оси связаны при изменении масштаба
+    #     vertical_spacing=0.05  # расстояние между графиками
+    # )
+   
+    # График использования ПК по-минутно
+    fig.add_trace( go.Scatter(
+            x = list_dates, 
+            y = list_q_times, 
+            mode = 'markers', marker_size=30, 
+            name = "Время использования"
+            ) )#, row=1, col=1 ) 
+    
+    # Диаграмма суммарного времени использования ПК по дням
+    fig.add_trace( go.Bar(
+        x = list_days, 
+        y = list_q_minutes,
+        name = "Минут в день",
+        text = list_q_minutes
+        )) #,2,1 ) 
+            
+    fig.update_layout(
+        title_text="Время использования ПК",
+        title_font_size=30,
+        xaxis_title="Даты",
+        yaxis_title="Минуты",    
+    )
+    
+    fig.update_yaxes(  
+        ticktext = ["06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "00:00"],
+        tickvals = [360, 540, 720, 900, 1080, 1260, 1440],
+        showline=True, linewidth=2, linecolor='black', mirror=True
+    )
+    
+    fig.update_xaxes(
+        showline=True, linewidth=2, linecolor='black', mirror=True
+    )
+    
+    fig.show()
     
     
 def press_ok():
