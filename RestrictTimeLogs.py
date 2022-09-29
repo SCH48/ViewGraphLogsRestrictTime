@@ -21,7 +21,8 @@ from plotly.subplots import make_subplots
 #import pandas as pd
 
 #######################################################################
-foldernamelog = "LOGS"                                              # имя папки с логами
+foldernamelog = "C:/Users/Максим/AppData/Roaming/RestrictTime"    # имя папки с логами
+#foldernamelog = "LOGS"
 dateFormat_file_name = "%Y-%m-%d"                        # формат даты в имени файла лога
 dateFormatInFiles =  "%d.%m.%Y"                               # формат даты внутри файла
 datetimeFormatInFiles =  "%d.%m.%Y %H:%M:%S"    # формат даты со временем внутри файла
@@ -160,7 +161,7 @@ def do_diag(time_content):
     fig.add_trace( go.Scatter(
             x = list_dates, 
             y = list_q_times, 
-            mode = 'markers', marker_size=30, 
+            mode = 'markers', marker_size=10, 
             name = "Время использования"
             ) )#, row=1, col=1 ) 
     
@@ -180,13 +181,8 @@ def do_diag(time_content):
     )
     
     fig.update_yaxes(  
-        ticktext = ["06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "00:00"],
-        tickvals = [360, 540, 720, 900, 1080, 1260, 1440],
-        showline=True, linewidth=2, linecolor='black', mirror=True
-    )
-    
-    fig.update_xaxes(
-        showline=True, linewidth=2, linecolor='black', mirror=True
+        ticktext = ["06:00","07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00"],
+        tickvals = [360,       420,       480,         540,      600,    660,        720,       780,       840,      900,      960,       1020,       1080,   1140,   1200,     1260,     1320,     1380,   1440],
     )
     
     fig.show()
