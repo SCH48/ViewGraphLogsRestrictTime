@@ -1,0 +1,73 @@
+
+
+
+#####################################################################
+
+from datetime import datetime
+# print(datetime.strptime("2022-10-15", "%Y-%m-%d"))
+# import dateutil.relativedelta as rltd
+# d = datetime.strptime("2013-03-31", "%Y-%m-%d")
+# d2 = d - rltd.relativedelta(months=1)
+# print(d2)
+
+today = datetime.now()
+t = today.time()
+m = t.hour * 60 + t.minute
+
+print (t, m)
+
+
+#####################################################################
+def parsed_timelist_to_string(listtimes):
+    """ Преобразовать список дат или времён в текстовый вид """
+    parsed_times = []
+    for t in listtimes:
+        t_parsed = str(t)
+        parsed_times.append(t_parsed)
+    return parsed_times
+
+#####################################################################
+
+# Этот код для двухоконного графика
+
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
+
+fig = plotly.subplots.make_subplots (
+    rows=2, cols=1,  # 2 строк и 1 столбец
+    shared_xaxes=True,  # горизонтальные оси связаны при изменении масштаба
+    vertical_spacing=0.05  # расстояние между графиками
+ )
+
+fig.add_trace( go.Scatter( x = list_dates,  y = list_q_times,   mode = 'markers',  marker_size=10,  name = "Время использования" ), row=1, col=1 ) 
+fig.add_trace( go.Bar( x = list_days,  y = list_q_minutes,  name = "Минут в день",  text = list_q_minutes),2,1 ) 
+
+
+#####################################################################
+
+
+def separate_date(list_times):
+    """ разделить формат времни на два списка дат и времён """
+    sep_dates = []; sep_times = []
+    for DT in list_times:
+        sep_dates.append(DT.date())
+        sep_times.append(DT.time())
+    return sep_dates, sep_times
+
+
+#####################################################################
+
+# Список дней по-быстрому, но если есть пропуски в днях то формируется неверно #? приведено для образца
+#for curday in (start_date + timedelta(n) for n in range(num_days)): 
+#    list_days.append(curday.date())
+
+#####################################################################
+
+# ?: Думаем как будем выводить данные    
+    # Быстрые экспресс диаграммы
+    #(px.bar(x=list_days, y=list_q_minutes)).show()
+    #(px.scatter(x=list_dates, y=list_q_times)).show()
+    
+#####################################################################
+

@@ -16,5 +16,7 @@ for (key, val) in data:
         )]
 
 layout = go.Layout(barmode='stack')
+
 fig = go.Figure(data=traces, layout=layout)
-plt.iplot(fig)
+
+plotly.plt.iplot(fig)

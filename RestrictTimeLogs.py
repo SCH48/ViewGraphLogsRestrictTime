@@ -1,7 +1,6 @@
 #######################################################################
 # Обработка лога посещения компьютера
 #######################################################################
-
 import os
 from datetime import date,datetime,timedelta
 import dateutil.relativedelta as rltd
@@ -13,60 +12,43 @@ from tkcalendar import Calendar, DateEntry
 import re #регулярные выражения
 
 import plotly
-import plotly.express as px
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-#import numpy as np
-#import pandas as pd
-
 #######################################################################
-foldernamelog = "C:/Users/Максим/AppData/Roaming/RestrictTime"    # имя папки с логами
-#foldernamelog = "LOGS"
-dateFormat_file_name = "%Y-%m-%d"                        # формат даты в имени файла лога
-dateFormatInFiles =  "%d.%m.%Y"                               # формат даты внутри файла
-datetimeFormatInFiles =  "%d.%m.%Y %H:%M:%S"    # формат даты со временем внутри файла
-default_days = 2    # ?временный параметр кол-во дней по-умолчанию для диаграммы 
+foldernamelog             = "LOGS"  # имя папки с логами
+#foldernamelog           = "C:/Users/Максим/AppData/Roaming/RestrictTime"   
+dateFormat_Filename = "%Y-%m-%d"                        # формат даты в имени файла лога
+datetimeFormat_InFiles =  "%d.%m.%Y %H:%M:%S"    # формат даты со временем внутри файла
 
 #######################################################################
 # Функции
 #######################################################################
-def get_all_dates(foldernamelog, dateFormat_file_name):
-    """ Получить все даты файлов в папке с логами Даты содержатся в именах файлов  """
+def get_all_dates(foldernamelog, dateFormat_Filename):
+    """ Получить список всех дат файлов в папке с логами из имён файлов  """
     listdates = []
+    
     for file in os.listdir(foldernamelog):
         if file.endswith(".log"):
             filename = file.split(".")[0]
-            datefile = datetime.strptime(filename, dateFormat_file_name)
+            datefile = datetime.strptime(filename, dateFormat_Filename)
             listdates.append(datefile)
+    
     return listdates
 
-def init_start_stop_dates(list_all_dates):
-    """ Получаем начальные границы дат как последняя доступная минус что-то  
-        (Пока не решил это будет фиксированное кол-во дней или минус 1 месяц)
-    """
-     # последняя дата есть последняя дата в журнале
-    stop_date = list_all_dates[-1] 
-    # начальная дата есть последняя минус default_days
-    #start_date = stop_date - timedelta(days=default_days)
-    # ?или же будет  минус 1 месяц
-    start_date = stop_date - rltd.relativedelta(months=1)
-    
-    return start_date, stop_date
-    
-def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles):
+def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_Filename, datetimeFormat_InFiles):
     """ Получить список времён из файлов с заданным диапазоном дат """
     time_content = []
     for file in os.listdir(foldernamelog):
         if file.endswith(".log"):
             filename = file.split(".")[0]
-            datefile = datetime.strptime(filename, dateFormat_file_name)
+            datefile = datetime.strptime(filename, dateFormat_Filename)
             if ( start_date <= datefile.date() <= stop_date ):
                
                 # Читаем строчки со временем из файла  в  time_content
                 with open( foldernamelog + "\\" + file, "r",  encoding='cp866') as fileobject:
                    # Флаг повторного значения минут
-                   pred_min_remaind = 0 
+                   pred_min_remaind = -1 
                    # Разбираем строку как <Дата> <Час>:<Минута>:.....<Осталось минут>
                    for line in fileobject: 
                         # Осталось минут в день
@@ -77,26 +59,10 @@ def get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_n
                         
                         pred_min_remaind = cur_min_remaind
                         # Дата в строке
-                        cur_date_in_str  =  datetime.strptime( re.search(r'\d{2}\.\d{2}\.\d{4}.\d{1,2}:\d{2}:\d{2}', line)[0], datetimeFormatInFiles ) 
+                        cur_date_in_str  =  datetime.strptime( re.search(r'\d{2}\.\d{2}\.\d{4}.\d{1,2}:\d{2}:\d{2}', line)[0], datetimeFormat_InFiles ) 
                         time_content.append( cur_date_in_str )
 
     return time_content
-
-def parsed_timelist_to_string(listtimes):
-    """ Преобразовать список дат или времён в текстовый вид """
-    parsed_times = []
-    for t in listtimes:
-        t_parsed = str(t)
-        parsed_times.append(t_parsed)
-    return parsed_times
-
-def separate_date(list_times):
-    """ разделить формат времни на два списка дат и времён """
-    sep_dates = []; sep_times = []
-    for DT in list_times:
-        sep_dates.append(DT.date())
-        sep_times.append(DT.time())
-    return sep_dates, sep_times
 
 def do_diag(time_content):
     """ Готовим данные для  графиков и вызываем их рисования"""
@@ -109,10 +75,7 @@ def do_diag(time_content):
     # А также разделим даты, время и минуты
     list_dates =[]; list_times = []; list_q_times = []
 
-    # Список дней по-быстрому, но если есть пропуски в днях то формируется неверно #? приведено для образца
-    #####  for curday in (start_date + timedelta(n) for n in range(num_days)): list_days.append(curday.date())
-
-    #  НО для ускорения бежим по контенту и формируем списки за один проход
+    #  Для ускорения бежим по контенту и формируем списки за один проход
     curDate = time_content[0].date();   curMinutes = []
     
     for curDT in  time_content:
@@ -141,52 +104,40 @@ def do_diag(time_content):
     list_minutes.append(curMinutes)
     list_q_minutes.append(len(curMinutes)) 
 
-    # ?: Думаем как будем выводить данные    
-    # Быстрые экспресс диаграммы
-    #(px.bar(x=list_days, y=list_q_minutes)).show()
-    #(px.scatter(x=list_dates, y=list_q_times)).show()
-    
-    #  Cетка графиков 
-    
+    # Рисуем
     fig = go.Figure()
-    
-    # Этот код для двухоконного графика
-    # fig = plotly.subplots.make_subplots(
-    #     rows=2, cols=1,  # 2 строк и 1 столбец
-    #     shared_xaxes=True,  # горизонтальные оси связаны при изменении масштаба
-    #     vertical_spacing=0.05  # расстояние между графиками
-    # )
    
     # График использования ПК по-минутно
-    fig.add_trace( go.Scatter(
-            x = list_dates, 
-            y = list_q_times, 
-            mode = 'markers', marker_size=10, 
-            name = "Время использования"
-            ) )#, row=1, col=1 ) 
+    fig.add_trace( go.Scatter (
+                x = list_dates,  y = list_q_times, 
+                mode = 'markers', marker_size=10, 
+                name = "Время использования",
+                hovertemplate = "%{x}<br>%{y} минута"
+            ))
     
     # Диаграмма суммарного времени использования ПК по дням
-    fig.add_trace( go.Bar(
-        x = list_days, 
-        y = list_q_minutes,
-        name = "Минут в день",
-        text = list_q_minutes
-        )) #,2,1 ) 
+    fig.add_trace( go.Bar (
+                x = list_days,  y = list_q_minutes,
+                name = "Минут в день",
+                text = list_q_minutes,
+                hovertemplate = "%{text} минут<br>%{x}"
+            )) 
             
     fig.update_layout(
-        title_text="Время использования ПК",
-        title_font_size=30,
-        xaxis_title="Даты",
-        yaxis_title="Минуты",    
-    )
+                title_text="Время использования ПК",
+                title_font_size=30,
+                xaxis_title="Даты",
+                yaxis_title="Минуты",    
+            )
     
     fig.update_yaxes(  
-        ticktext = ["06:00","07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00"],
-        tickvals = [360,       420,       480,         540,      600,    660,        720,       780,       840,      900,      960,       1020,       1080,   1140,   1200,     1260,     1320,     1380,   1440],
+        #["06:00","07:00", "08:00", ...  "23:00", "24:00"],
+        ticktext = [ "0"+str(i) +":00" for i in range(1,10) ] +[ str(i) +":00" for i in range(10,25) ],
+        #[360, 960, 1020,    ...   1380,   1440],
+        tickvals = [ i*60 for i in range(1,25)]
     )
     
     fig.show()
-    
     
 def press_ok():
     """ Обработчик кнопки "Нарисовать" главного окна.
@@ -195,7 +146,7 @@ def press_ok():
     # Получаем диапазон дат из гланого окна
     start_date = entryStart.get_date();   stop_date =  entryStop.get_date()
     # Читаем данные из файлов
-    time_content = get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_file_name, datetimeFormatInFiles) 
+    time_content = get_times_from_files(foldernamelog, start_date, stop_date, dateFormat_Filename, datetimeFormat_InFiles) 
     # Рисуем контент
     do_diag(time_content)
     
@@ -206,17 +157,19 @@ def press_ok():
 # Список всех возможных дат из имён файлов, 
 # пока только для одной цели - найти крайние возможные даты которые видны в сообщении
 # TODO: хотелось их как-то помечать в календаре что на эту дату есть данные
-list_all_dates = get_all_dates(foldernamelog, dateFormat_file_name)  
+list_all_dates = get_all_dates(foldernamelog, dateFormat_Filename)  
  
  # Получаем начальную и конечную даты для диаграммы вычислением от ближайшей минус что-то
-start_date, stop_date = init_start_stop_dates(list_all_dates)                
+stop_date = list_all_dates[-1] 
+# начальная дата есть последняя минус "что-то"
+#start_date = stop_date - timedelta(days=3)                 # минус дни
+start_date = stop_date - rltd.relativedelta(months=1)   # или же месяцы
 
 # Рисуем форму для корректировки диапазона дат с помощью виджета календаря 
 # и по кнопке "Нарисовать" запускаем рисование диаграммы через press_ok()
 root = Tk()
 root.resizable(width=False, height=False)
 root.title("Статистика посещений")
-
 lblTop = Label(root, text="Выберите период", font='Arial 13 bold')
 lblTop.pack(side=TOP, padx=100, pady=5)
 
