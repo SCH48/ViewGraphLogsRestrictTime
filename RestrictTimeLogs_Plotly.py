@@ -1,7 +1,10 @@
 #######################################################################
-# Обработка лога посещения компьютера
+# Обработка журналов посещения компьютера 
+# c выбором диапазона дат с помощью библтотеки tkcslendar
+# и выводом результатов с помощью библиотеки Plotly
 #######################################################################
 import os
+
 from datetime import date,datetime,timedelta
 import dateutil.relativedelta as rltd
 
@@ -15,6 +18,8 @@ import plotly
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
+#######################################################################
+# Стартовые переменные
 #######################################################################
 foldernamelog             = "LOGS"  # имя папки с логами
 #foldernamelog           = "C:/Users/Максим/AppData/Roaming/RestrictTime"   
