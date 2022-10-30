@@ -110,12 +110,13 @@ def do_diag(time_content):
 
     fig = go.Figure()
    
-    # График использования ПК по-минутно
+    # График использования ПК поминутно
     fig.add_trace( go.Scatter (
                 x = list_dates,  y = list_q_times, 
                 mode = 'markers', marker_size=10, 
                 name = "Время использования",
-                hovertemplate = "%{x}<br>%{y} минута"
+                text = list_times,
+                hovertemplate = "%{x}<br>%{y} минута<br>%{text}"
             ))
     
     # Диаграмма суммарного времени использования ПК по дням
@@ -164,8 +165,8 @@ list_all_dates = get_all_dates(foldernamelog, dateFormat_Filename)
  # Получаем начальную и конечную даты для диаграммы вычислением от ближайшей минус что-то
 stop_date = list_all_dates[-1] 
 # начальная дата есть последняя минус "что-то"
-#start_date = stop_date - timedelta(days=3)                 # минус дни
-start_date = stop_date - rltd.relativedelta(months=1)   # или же месяцы
+start_date = stop_date - timedelta(days=1)                 # минус дни
+#start_date = stop_date - rltd.relativedelta(months=1)   # или же месяцы
 
 # Рисуем форму для корректировки диапазона дат с помощью виджета календаря 
 # и по кнопке "Нарисовать" запускаем рисование диаграммы через press_ok()
