@@ -21,9 +21,9 @@ from plotly.subplots import make_subplots
 #######################################################################
 # Стартовые переменные
 #######################################################################
-foldernamelog             = "LOGS"  # имя папки с логами
-foldernamelog           = "C:/Users/Максим/AppData/Roaming/RestrictTime"   
-dateFormat_Filename = "%Y-%m-%d"                        # формат даты в имени файла лога
+foldernamelog              = "LOGS"  # имя папки с логами
+foldernamelog              = "C:/Users/Максим/AppData/Roaming/RestrictTime"   
+dateFormat_Filename   = "%Y-%m-%d"                        # формат даты в имени файла лога
 datetimeFormat_InFiles =  "%d.%m.%Y %H:%M:%S"    # формат даты со временем внутри файла
 
 #######################################################################
