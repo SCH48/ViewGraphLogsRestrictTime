@@ -22,7 +22,7 @@ from plotly.subplots import make_subplots
 # Стартовые переменные
 #######################################################################
 foldernamelog             = "LOGS"  # имя папки с логами
-#foldernamelog           = "C:/Users/Максим/AppData/Roaming/RestrictTime"   
+foldernamelog           = "C:/Users/Максим/AppData/Roaming/RestrictTime"   
 dateFormat_Filename = "%Y-%m-%d"                        # формат даты в имени файла лога
 datetimeFormat_InFiles =  "%d.%m.%Y %H:%M:%S"    # формат даты со временем внутри файла
 
@@ -109,6 +109,7 @@ def do_diag(time_content):
     list_minutes.append(curMinutes)
     list_q_minutes.append(len(curMinutes)) 
 
+    print(list_times)
     # Рисуем
     fig = go.Figure()
    
@@ -117,15 +118,15 @@ def do_diag(time_content):
                 x = list_dates,  y = list_q_times, 
                 mode = 'markers', marker_size=10, 
                 name = "Время использования",
-                hovertemplate = "%{x}<br>%{y} минута"
+                text = list_minutes,
+                hovertemplate = "%{x}<br>%{text} минута"
             ))
     
     # Диаграмма суммарного времени использования ПК по дням
     fig.add_trace( go.Bar (
                 x = list_days,  y = list_q_minutes,
                 name = "Минут в день",
-                text = list_q_minutes,
-                hovertemplate = "%{text} минут<br>%{x}"
+                hovertemplate = "%{y} минут<br>%{x}"
             )) 
             
     fig.update_layout(
