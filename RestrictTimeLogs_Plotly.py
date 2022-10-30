@@ -93,7 +93,6 @@ def do_diag(time_content):
             list_q_times.append(m)
             list_dates.append(curDT.date())
             list_times.append(curDT.time())
-
             continue
     
         # новый день, подводим итоги в списки
@@ -109,8 +108,6 @@ def do_diag(time_content):
     list_minutes.append(curMinutes)
     list_q_minutes.append(len(curMinutes)) 
 
-    print(list_times)
-    # Рисуем
     fig = go.Figure()
    
     # График использования ПК по-минутно
@@ -118,8 +115,7 @@ def do_diag(time_content):
                 x = list_dates,  y = list_q_times, 
                 mode = 'markers', marker_size=10, 
                 name = "Время использования",
-                text = list_minutes,
-                hovertemplate = "%{x}<br>%{text} минута"
+                hovertemplate = "%{x}<br>%{y} минута"
             ))
     
     # Диаграмма суммарного времени использования ПК по дням
