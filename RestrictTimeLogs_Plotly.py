@@ -116,28 +116,30 @@ def do_diag(time_content):
                 mode = 'markers', marker_size=10, 
                 name = "Время использования",
                 text = list_times,
-                hovertemplate = "%{x}<br>%{y} минута<br>%{text}"
-            ))
-    
+                hovertemplate =  "%{x}<br>%{text}" 
+    ))
     # Диаграмма суммарного времени использования ПК по дням
     fig.add_trace( go.Bar (
                 x = list_days,  y = list_q_minutes,
                 name = "Минут в день",
-                hovertemplate = "%{y} минут<br>%{x}"
-            )) 
+                hovertemplate = "%{x}<br>%{y} минут"
+    )) 
             
     fig.update_layout(
                 title_text="Время использования ПК",
                 title_font_size=30,
                 xaxis_title="Даты",
                 yaxis_title="Минуты",    
-            )
+     )
+    
+    fig.update_xaxes(showspikes=True, spikecolor="red", spikesnap="cursor", spikemode="across")
     
     fig.update_yaxes(  
         #["06:00","07:00", "08:00", ...  "23:00", "24:00"],
         ticktext = [ "0"+str(i) +":00" for i in range(1,10) ] +[ str(i) +":00" for i in range(10,25) ],
         #[360, 960, 1020,    ...   1380,   1440],
-        tickvals = [ i*60 for i in range(1,25)]
+        tickvals = [ i*60 for i in range(1,25)],
+        showspikes=True
     )
     
     fig.show()
@@ -165,8 +167,8 @@ list_all_dates = get_all_dates(foldernamelog, dateFormat_Filename)
  # Получаем начальную и конечную даты для диаграммы вычислением от ближайшей минус что-то
 stop_date = list_all_dates[-1] 
 # начальная дата есть последняя минус "что-то"
-start_date = stop_date - timedelta(days=1)                 # минус дни
-#start_date = stop_date - rltd.relativedelta(months=1)   # или же месяцы
+#start_date = stop_date - timedelta(days=1)                 # минус дни
+start_date = stop_date - rltd.relativedelta(months=1)   # или же месяцы
 
 # Рисуем форму для корректировки диапазона дат с помощью виджета календаря 
 # и по кнопке "Нарисовать" запускаем рисование диаграммы через press_ok()
