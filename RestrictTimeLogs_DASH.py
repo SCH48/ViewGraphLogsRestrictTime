@@ -4,11 +4,11 @@
 # и выводом результатов с помощью библиотеки dash
 #######################################################################
 import os
-from datetime import date,datetime,timedelta
-import re #регулярные выражения
+import re  # регулярные выражения
+from datetime import date, datetime, timedelta
+
 import dateutil.relativedelta as rltd
 import pandas as pd
-
 
 #######################################################################
 # Стартовые переменные

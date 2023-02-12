@@ -4,19 +4,16 @@
 # и выводом результатов с помощью библиотеки Plotly
 #######################################################################
 import os
-
-from datetime import date,datetime,timedelta
-import dateutil.relativedelta as rltd
-
-from tkinter.font import ITALIC
+import re  # регулярные выражения
+from datetime import date, datetime, timedelta
 from tkinter import *
-from tkcalendar import Calendar, DateEntry
+from tkinter.font import ITALIC
 
-import re #регулярные выражения
-
+import dateutil.relativedelta as rltd
 import plotly
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
+from tkcalendar import Calendar, DateEntry
 
 #######################################################################
 # Стартовые переменные
